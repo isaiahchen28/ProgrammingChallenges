@@ -1,6 +1,7 @@
 # ProgrammingChallenges
-Miscellaneous code challenges for practicing programming and machine learning.
+This is a repository for various programming challenges and machine learning challenges.
 
-Miscellaneous Links are here:
+Relevant links are for certain resources are listed here:
 
+https://projecteuler.net/about
 http://yann.lecun.com/exdb/mnist/
