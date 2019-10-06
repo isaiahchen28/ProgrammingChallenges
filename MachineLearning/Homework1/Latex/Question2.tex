@@ -1,0 +1,7 @@
+\section*{Question 2}
+For values of $h$ uniformly spaced over the interval [0.01, 1], the 10-fold cross-validation error $\varepsilon_{cv}$($h$) is calculated and shown below in Figure 3. The cross-validation error is minimized for an $h_{0}$ value of 0.9336 ($\varepsilon_{cv}$($h_{0}$) = 1.2179). Once $\hat{f}_{h_{0}}$ has been retrained using the whole training set, the error evaluated using the test set is calculated to be 1.1374. However, it is important to note that the data appear very noisy and the optimal kernel bandwidth may fluctuate between different runs of the program.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[height=4in]{Figure_9.png}
+    \caption{Cross-validation error as a function of $h$ for the kernel regression estimator}
+\end{figure}

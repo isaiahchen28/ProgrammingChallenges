@@ -1,0 +1,42 @@
+\section*{Question 2}
+We now consider a penalized version of the previous problem minimizing
+\begin{center}
+    $F_{\lambda}(\theta, b) = -2$trace$(b^{T}M^{T}C\theta)$ + trace$(b^{T}\Sigma_{XX}b) + \lambda\sum\limits_{i=1}^d\sum\limits_{j=1}^r |b(i, j)|$
+\end{center}
+with respect to $\theta$ and $b$ with the constraints $\theta^{T}C\theta =$ Id$_{\mathbb{R}^{r}}$ and $\theta^{T}C\textbf{1} = 0$. We now want to assume that $\theta$ is fixed and minimize with respect to $b$.
+
+(1) The optimal $b$ can be obtained using the following version of the alternating direction method of multipliers (ADMM) algorithm, where we iterate
+\begin{center}
+    $\begin{cases}
+    b \leftarrow (\Sigma_{XX} + \frac{\text{Id}}{2\rho})^{-1}(M^{T}C\theta + \frac{\gamma - \tau}{2\rho}) \\
+    \gamma \leftarrow S_{\lambda p}(b + \tau) \\
+    \tau \leftarrow \tau + b - \gamma
+    \end{cases}$
+\end{center}
+$\tau$ and $\gamma$ are both $d \times r$ matrices, $\rho$ is a small positive number, and $S_{\lambda\rho}$ is the shrinking operator, which applies the function $t \mapsto (|t| - \lambda\rho)^{+}$ to every element of a matrix.
+
+In order to prove that this algorithm can be used to find the optimal $b$, we need to make some assumptions. We assume that all functions involved are closed, proper, and convex as to ensure that it is always possible to update the relevant parameters in the algorithm. We also assume that the associated Lagrangian has a saddle point representing the minimum of the function. Therefore, we must have residual convergence of the primal problem, objective convergence to the optimal $b$, and convergence of the dual problem to 0.
+
+Also, we can rewrite the minimization of b as $r$ independent problems (each one corresponding to each column of $b$) that are similar to the lasso problem. The ADMM algorithm can be applied to each independent problem and can be proven to work provided that $\rho$ is small enough.
+
+If we simplify each term in $F_{\lambda}$, we can see that $b^{T}M^{T}C\theta$ and $b^{T}\Sigma_{XX}b$ will both be $r \times r$ matrices. Taking the trace of these expressions will result in scalar values that can be easily added to each other to calculate the value of $F_{\lambda}$. Looking at the individual iterations in the algorithm, we can simplify both terms in the expression for $b$ and we observe that we are essentially multiplying a $d \times d$ matrix by a $d \times r$ matrix. This is representative of solving a system of linear equations with $r$ independent equations. If the algorithm can be applied to each independent equation, then it must also follow that the original problem can be minimized using the same ADMM algorithm.
+
+(2) We can describe a minimization algorithm for $F_{\lambda}$ that is initialized with
+\begin{center}
+    $\theta = C^{-1/2}
+    \begin{pmatrix}
+    $Id$_{\mathbb{R}^{r}} \\
+    0
+    \end{pmatrix}$
+\end{center}
+and alternates a minimization step with fixed $\theta$ and a minimization step with fixed $b$ until convergence is reached. For all odd-numbered steps of the algorithm, we will update $b$ by minimizing
+\begin{center}
+    $-2$trace$(b^{T}M^{T}C\theta)$ + trace$(b^{T}\Sigma_{XX}b) + \lambda\sum\limits_{i=1}^d\sum\limits_{j=1}^r |b(i, j)|$
+\end{center}
+with fixed $\theta$. This minimization is performed using the \textit{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} algorithm, which is suitable because there are no constraints on $b$ that need to be considered. Once $b$ is updated, we will also check that rank($Mb) \geq r$ using the updated value of $b$. For all even-numbered steps of the algorithm, we will update $\theta$ by minimizing
+\begin{center}
+    $-2$trace$(b^{T}M^{T}C\theta)$ + trace$(b^{T}\Sigma_{XX}b) + \lambda\sum\limits_{i=1}^d\sum\limits_{j=1}^r |b(i, j)|$
+\end{center}
+with fixed $b$ and subject to the constraints $\theta^{T}C\theta =$ Id$_{\mathbb{R}^{r}}$ and $\theta^{T}C\textbf{1} = 0$. This minimization is performed using the \textit{Sequential Least Squares Programming (SLSQP)} algorithm, which behaves similarly to any sequential quadratic programming method that is used to optimize a nonlinear function that is subject to constraints.
+
+For every step of the algorithm, once we have updated either $b$ or $\theta$, we will then evaluate $F_{\lambda}$ using the updated values and compare it to the evaluation of this function from the previous step. If the absolute value of the difference between the two evaluations is within a desired tolerance, then we have converged at the minimum of $F_{\lambda}$ and we have determined the optimal values for $b$ and $\theta$.

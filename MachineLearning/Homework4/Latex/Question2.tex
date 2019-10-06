@@ -1,0 +1,70 @@
+\section*{Question 2}
+(1) Using the procedure described in the question, an estimator is calculated using the following kernel:
+\begin{center}
+    \large{$K_{\sigma}(x, x') = (1 + \frac{|x - x'|}{\sigma} + \frac{{|x - x'|}^{2}}{3{\sigma}^{2}})e^{-\frac{|x - x'|}{\sigma}}$}
+\end{center}
+For this problem, $m = 10$ and $v_{1},...,v_{10}$ correspond to the $m$ columns of the ten-dimensional identity matrix. Using the methodology described in the problem description, an SVM has been trained and the resulting confusion matrix for the test data is shown below:
+\begin{center}
+    $\begin{bmatrix}
+        0.9857 & 0 & 0 & 0 & 0.0143 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0.9592 & 0.0204 & 0 & 0 & 0 & 0 & 0.0204 & 0 & 0 \\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0.9783 & 0 & 0 & 0 & 0.0217 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0.9836 & 0 & 0 & 0.0164 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0.0189 & 0.9811 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    \end{bmatrix}$
+\end{center}
+where an element $a(g, g_{0}), g, g_{0} \in \mathcal{G}$ provides the fraction of testing samples whose true class is $g_{0}$ that are predicted to belong in class $g$. This syntax for all following confusion matrices applies.
+
+(2) For this problem, $m = 20$ and $v_{1},...,v_{m}$ are given by random permutations of $v_{0}$ containing five zeros and five ones. Using the same kernel from Question 2.1 for training, the resulting confusion matrix is shown below:
+\begin{center}
+    $\begin{bmatrix}
+        0.9714 & 0 & 0 & 0 & 0.0143 & 0 & 0 & 0 & 0.0143 & 0 \\
+        0 & 0.9592 & 0.0204 & 0 & 0 & 0 & 0 & 0.0204 & 0 & 0 \\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0.9783 & 0 & 0 & 0 & 0.0217 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0.9836 & 0 & 0 & 0.0164 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0.0189 & 0.9811 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    \end{bmatrix}$
+\end{center}
+This confusion matrix is nearly equivalent to the confusion matrix from the previous question. This must be due to the classifier that is used to determine which class each sample belongs to. The classifier must be nearly similar, if not equivalent for both problems.
+
+(3) We repeat the analysis for the two values of m using the Cauchy kernel defined in Question 1. The resulting confusion matrix for $m = 10$ is shown below:
+\begin{center}
+    $\begin{bmatrix}
+        0.9714 & 0 & 0 & 0 & 0.0143 & 0 & 0 & 0 & 0.0143 & 0 \\
+        0 & 0.9592 & 0.0204 & 0 & 0 & 0 & 0 & 0.0204 & 0 & 0 \\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0.9783 & 0 & 0 & 0 & 0.0217 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0.9836 & 0 & 0 & 0.0164 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0.0189 & 0.9811 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    \end{bmatrix}$
+\end{center}
+The resulting confusion matrix for $m = 20$ is shown below:
+\begin{center}
+    $\begin{bmatrix}
+        0.9714 & 0 & 0 & 0 & 0.0143 & 0 & 0 & 0 & 0.0143 & 0 \\
+        0 & 0.9592 & 0.0204 & 0 & 0 & 0 & 0 & 0.0204 & 0 & 0 \\
+        0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0.9783 & 0 & 0 & 0 & 0.0217 & 0 & 0 \\
+        0 & 0.0164 & 0 & 0 & 0.9836 & 0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0.0189 & 0.9811 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
+    \end{bmatrix}$
+\end{center}
+For all 4 cases in Question 2, the SVM is able to consistently predict what the correct class is for the large majority of the samples in the test data. Again, this consistency may indicate that the classifier is nearly equivalent for all these cases. Because the methodology for computing the classifier is different for different values of $m$, the confusion matrices should be more varied. This may be due to possible programming errors.

@@ -1,0 +1,78 @@
+\section*{Question 1}
+Given a training set $(x_{1}, y_{1})$,...,$(x_{N}, y_{N})$ with $x_{k} \in \mathbb{R}^{d}$ and $y_{k} \in \mathcal{G} = \{g_{1},...,g_{q}\}$, optimal scoring is formulated in terms of the minimization of
+\begin{center}
+    $F_{0}(\theta, b) = -2$trace$(b^{T}M^{T}C\theta)$ + trace$(b^{T}\Sigma_{XX}b)$
+\end{center}
+with respect to $\theta$ and $b$ with the constraints $\theta^{T}C\theta =$ Id$_{\mathbb{R}^{r}}$ and $\theta^{T}C\textbf{1}_{d} = 0$. Here, $b$ is a $d \times r$ matrix;
+\begin{center}
+    $\theta =
+    \begin{pmatrix}
+    \theta_{g_{1}}^{T}\\
+    \vdots \\
+    \theta_{g_{q}}^{T}
+    \end{pmatrix}$
+\end{center}
+is a $q \times r$ matrix (with $r$ chosen between 1 and $q - 1$);
+\begin{center}
+    $M =
+    \begin{pmatrix}
+    (\mu_{g_{1}} - \mu)^{T}\\
+    \vdots \\
+    (\mu_{g_{q}} - \mu)^{T}
+    \end{pmatrix}$
+\end{center}
+is a $q \times d$ matrix, where $\mu_{g}$ is the average over $x_{k}$ such that $y_{k} = g$ and $\mu$ is the global average over all $x_{k}$'s; $C$ is the diagonal matrix with diagonal coefficients $N_{g_{1}}/N$,...,$N_{g_{q}}/N$, $N_{g}$ being the size of class $g$ and $\textbf{1}_{d}$ is the $d$-dimensional vector with all coefficients equal to one; finally, $\Sigma_{XX} = \mathcal{X}_{c}^{T}\mathcal{X}_{c}/N$, where $\mathcal{X}_{c}$ is the $N \times d$ matrix with $k$th row given by $(x_{k} - \mu)^{T}$.
+
+We want to minimize $F_{0}$ with respect to $\theta$ for fixed $b$. We choose to define $\tilde{\theta} = U^{T}C^{1/2}\theta V$, where $UDV^{T}$ is the SVD of $C^{1/2}Mb$. $C^{1/2}Mb$ will be a $q \times r$ matrix. Consquently, $U, D,$ and $V^{T}$ will have dimensions $q \times q, q \times r,$ and $r \times r$, respectively. In order for there to be an optimal solution with the variables we have defined, rank($Mb) \geq r$. If rank($Mb) < r$, the number of independent equations that are being minimized in the optimization problem will be too low for there to be a feasible solution. This also explains why $r$ must be chosen appropriately between 1 and $q - 1$.
+
+First, we can solve for $\theta$:
+\begin{center}
+    $\tilde{\theta} = U^{T}C^{1/2}\theta V$
+    
+    $\tilde{\theta}V^{-1} = U^{T}C^{1/2}\theta$
+    
+    $\theta = C^{-1/2}U\tilde{\theta}V^{-1}$
+\end{center}
+We can plug this expression for $\theta$ into the original function $F_{0}$ and assume that $b$ is fixed. $F_{0}$ can now be written in terms of $\tilde{\theta}$:
+\begin{center}
+    $F_{0}(\tilde{\theta}) = -2$trace$(b^{T}M^{T}C^{1/2}U\tilde{\theta}V^{-1})$ + trace$(b^{T}\Sigma_{XX}b)$
+\end{center}
+The two constraints can now be written as $V\tilde{\theta}^{T}\tilde{\theta}V^{-1} - $ Id$_{\mathbb{R}^{r}} = 0$ and $V\tilde{\theta}^{T}U^{T}C^{1/2}\textbf{1}_{d} = 0$.
+We can use the method of Lagrange multipliers to minimize $F_{0}$. We choose the Lagrange multipliers $\alpha$ and $\beta$ to satisfy
+\begin{center}
+    \large{$\frac{\partial F_{0}}{\partial\tilde{\theta}} + \alpha\frac{\partial G_{1}}{\partial\tilde{\theta}} + \beta\frac{\partial G_{2}}{\partial\tilde{\theta}} = 0$}
+\end{center}
+where $G_{1}$ and $G_{2}$ correspond to the two constraints, respectively. After taking derivatives of both the function to be minimized and the two constraints, we can plug them into the expression above:
+\begin{center}
+    $-2U^{T}C^{1/2}M^{T}b^{T}V + \alpha(V\tilde{\theta}^{T}V^{T}+V\tilde{\theta}V^{T}) + \beta V\tilde{\theta}^{T}U^{-1}C^{1/2}\textbf{1}_{d} = 0$
+\end{center}
+This equation, along with the two constraints, are a system of equations that can be solved for $\tilde{\theta}, \alpha$, and $\beta$. While the solutions of $\alpha$ and $\beta$ are not necessarily relevant for finding $\tilde{\theta}$ for this specific case, we can find that
+\begin{center}
+    $\tilde{\theta} = 
+    \begin{pmatrix}
+    $Id$_{\mathbb{R}^{r}} \\
+    0
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+    V^{T} \\
+    0
+    \end{pmatrix}
+    V$
+\end{center}
+We can multiply both sides of this expression by the desired variables $C^{-1/2}$ and $V^{-1}$ to return to our original definition of $\theta$:
+\begin{center}
+    $C^{-1/2}\tilde{\theta}V^{-1} = C^{-1/2}U
+    \begin{pmatrix}
+    V^{T} \\
+    0
+    \end{pmatrix}$
+\end{center}
+The left side of this equation is equal to original defintion of $\theta$. Therefore, if rank$(Mb) \geq r$, the optimal $\theta$ is given by
+\begin{center}
+    $\theta = C^{-1/2}U
+    \begin{pmatrix}
+    V^{T} \\
+    0
+    \end{pmatrix}$
+\end{center}
