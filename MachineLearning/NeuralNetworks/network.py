@@ -2,8 +2,6 @@
 A module to implement the stochastic gradient descent learning
 algorithm for a feedforward neural network. Gradients are calculated
 using backpropagation.
-
-http://neuralnetworksanddeeplearning.com/chap1.html
 '''
 import numpy as np
 import random
