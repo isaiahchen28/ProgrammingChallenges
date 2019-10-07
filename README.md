@@ -1,7 +1,7 @@
-# Programming Challenges
-This is a repository for various programming and machine learning challenges.
+# Programming and Machine Learning Challenges
+This is a repository for my attempts at various programming and machine learning challenges.
 
-Relevant links are for certain resources are listed here:
+Relevant links are for resources are listed here:
 * https://projecteuler.net/about
 * https://www.reddit.com/r/dailyprogrammer/
 * http://yann.lecun.com/exdb/mnist/
