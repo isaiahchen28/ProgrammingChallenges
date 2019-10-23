@@ -72,7 +72,7 @@ def get_colors():
     }
 
 
-def save_maze(maze, blockSize, name, directory="training"):
+def save_maze(maze, blockSize, name, directory):
     '''
     This will save a maze object to a file.
     **Parameters**
@@ -88,6 +88,8 @@ def save_maze(maze, blockSize, name, directory="training"):
             How many pixels each block is comprised of.
         name: *str, optional*
             The name of the maze.png file to save.
+        directory: *string*
+            The location where the output file will be saved.
     **Returns**
         None
     '''
@@ -108,7 +110,7 @@ def save_maze(maze, blockSize, name, directory="training"):
                     img.putpixel((x + i, y + j), colors[maze[jx][jy]])
     if not name.endswith(".png"):
         name += ".png"
-    # Create directory for training set if it doesn't exist
+    # Create directory if it doesn't exist
     if not os.path.exists(directory):
         os.mkdir(directory)
     # Save the image in the proper directory
@@ -116,7 +118,7 @@ def save_maze(maze, blockSize, name, directory="training"):
     img.save(output_string)
 
 
-def load_maze(filename, blockSize, directory="training"):
+def load_maze(filename, blockSize, directory):
     '''
     This will read a maze from a png file into a 2d list with values
     corresponding to the known color dictionary.
@@ -125,6 +127,8 @@ def load_maze(filename, blockSize, directory="training"):
             The name of the maze.png file to load.
         blockSize: *int, optional*
             How many pixels each block is comprised of.
+        directory: *string*
+            The location where the output file will be saved.
     **Returns**
         maze: *list, list, int*
             A 2D array holding integers specifying each block's color.
@@ -163,7 +167,7 @@ def pos_chk(x, y, nBlocks):
     return x >= 0 and x < nBlocks and y >= 0 and y < nBlocks
 
 
-def generate_maze(nBlocks, name, start, blockSize, slow):
+def generate_maze(nBlocks, name, start, blockSize, slow, directory):
     '''
     Generate a maze using the Depth First Search method.
     **Parameters**
@@ -177,6 +181,8 @@ def generate_maze(nBlocks, name, start, blockSize, slow):
             How many pixels each block will be.
         slow: *bool, optional*
             Whether to save and lag on generation so as to view the mazegen.
+        directory: *string*
+            The location where the output file will be saved.
     **Returns**
         None
     '''
@@ -235,14 +241,15 @@ def generate_maze(nBlocks, name, start, blockSize, slow):
             positions.pop()
             list_of_directions.pop()
         if slow:
-            save_maze(maze, blockSize=blockSize, name=name)
+            save_maze(maze, blockSize=blockSize, name=name,
+                      directory=directory)
     # Save the generated maze and set start/end points
     maze[0][0] = 4
     maze[len(maze) - 1][len(maze) - 1] = 4
-    save_maze(maze, blockSize=blockSize, name=name)
+    save_maze(maze, blockSize=blockSize, name=name, directory=directory)
 
 
-def solve_maze(filename, start, end, blockSize, slow):
+def solve_maze(filename, start, end, blockSize, slow, directory):
     '''
     Solve a maze using the Depth First Search method.
     **Parameters**
@@ -256,6 +263,8 @@ def solve_maze(filename, start, end, blockSize, slow):
             How many pixels each block will be.
         slow: *bool, optional*
             Whether to save and lag on generation so as to view the mazegen.
+        directory: *string*
+            The location where the output file will be saved.
     **Returns**
         None
     '''
@@ -263,7 +272,7 @@ def solve_maze(filename, start, end, blockSize, slow):
     if ".png" in filename:
         filename = filename.split(".png")[0]
     # Load the maze
-    maze = load_maze(filename, blockSize=blockSize)
+    maze = load_maze(filename, blockSize=blockSize, directory=directory)
     nBlocks = len(maze)
     # Initialize stack of positions
     positions = [start]
@@ -308,19 +317,30 @@ def solve_maze(filename, start, end, blockSize, slow):
             maze[current_x][current_y] = 3
             positions.pop()
         if slow:
-            save_maze(
-                maze, blockSize=blockSize, name="%s_solved.png" % filename)
+            save_maze(maze, blockSize=blockSize,
+                      name="%s_solved.png" % filename, directory=directory)
     # Check if a solution has been found
     if not any([m == 2 for row in maze for m in row]):
         print("NO VALID SOLUTION FOR THE CHOSEN ENDPOINT!")
     # Save the solved maze
-    save_maze(maze, blockSize=blockSize, name="%ss.png" % filename)
+    save_maze(maze, blockSize=blockSize, name="%ss.png" % filename,
+              directory=directory)
 
 
 if __name__ == "__main__":
-    # Generate mazes and solutions for training
-    N = 100
-    for i in range(N):
-        generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False)
+    # Generate mazes and solutions for training data
+    N_train = 100
+    directory = "training"
+    for i in range(N_train):
+        generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False,
+                      directory=directory)
         solve_maze(str(i), start=(0, 0), end=(49, 49), blockSize=10,
-                   slow=False)
+                   slow=False, directory=directory)
+    # Generate mazes and solutions for testing data
+    N_test = 10
+    directory = "testing"
+    for i in range(N_test):
+        generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False,
+                      directory=directory)
+        solve_maze(str(i), start=(0, 0), end=(49, 49), blockSize=10,
+                   slow=False, directory=directory)
