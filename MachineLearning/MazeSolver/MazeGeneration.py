@@ -47,6 +47,7 @@ needs making.
 '''
 import random
 from PIL import Image
+import os
 
 
 def get_colors():
@@ -71,7 +72,7 @@ def get_colors():
     }
 
 
-def save_maze(maze, blockSize, name):
+def save_maze(maze, blockSize, name, directory="training"):
     '''
     This will save a maze object to a file.
     **Parameters**
@@ -107,7 +108,12 @@ def save_maze(maze, blockSize, name):
                     img.putpixel((x + i, y + j), colors[maze[jx][jy]])
     if not name.endswith(".png"):
         name += ".png"
-    img.save("%s" % name)
+    # Create directory for training set if it doesn't exist
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    output_string = "/" + directory + "/" + name
+    print(output_string)
+    img.save(output_string)
 
 
 def load_maze(filename, blockSize):
