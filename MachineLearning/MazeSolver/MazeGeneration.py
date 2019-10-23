@@ -111,12 +111,12 @@ def save_maze(maze, blockSize, name, directory="training"):
     # Create directory for training set if it doesn't exist
     if not os.path.exists(directory):
         os.mkdir(directory)
-    output_string = "/" + directory + "/" + name
-    print(output_string)
+    # Save the image in the proper directory
+    output_string = directory + "/" + name
     img.save(output_string)
 
 
-def load_maze(filename, blockSize):
+def load_maze(filename, blockSize, directory="training"):
     '''
     This will read a maze from a png file into a 2d list with values
     corresponding to the known color dictionary.
@@ -131,7 +131,7 @@ def load_maze(filename, blockSize):
     '''
     if ".png" in filename:
         filename = filename.split(".png")[0]
-    img = Image.open(filename + ".png")
+    img = Image.open(directory + "/" + filename + ".png")
     dims, _ = img.size
     nBlocks = int(dims / blockSize)
     colors = get_colors()
@@ -319,7 +319,7 @@ def solve_maze(filename, start, end, blockSize, slow):
 
 if __name__ == "__main__":
     # Generate mazes and solutions for training
-    N = 10
+    N = 100
     for i in range(N):
         generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False)
         solve_maze(str(i), start=(0, 0), end=(49, 49), blockSize=10,
