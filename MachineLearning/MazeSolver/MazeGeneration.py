@@ -118,7 +118,7 @@ def save_maze(maze, blockSize, name, directory):
     img.save(output_string)
 
 
-def load_maze(filename, blockSize, directory):
+def load_maze(filename, blockSize=10, directory=""):
     '''
     This will read a maze from a png file into a 2d list with values
     corresponding to the known color dictionary.
