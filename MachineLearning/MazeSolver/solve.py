@@ -398,3 +398,5 @@ if __name__ == '__main__':
 
     qmaze = Qmaze(maze)
     show(qmaze)
+    model = build_model(maze)
+	qtrain(model, maze, epochs=1000, max_memory=8*maze.size, data_size=32)
