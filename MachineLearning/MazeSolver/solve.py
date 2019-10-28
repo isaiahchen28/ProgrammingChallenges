@@ -2,16 +2,12 @@
 Maze Solver
 '''
 from __future__ import print_function
-import os
-import sys
-import time
 import datetime
 import json
 import random
 import numpy as np
 from keras.models import Sequential
-from keras.layers.core import Dense, Activation
-from keras.optimizers import SGD, Adam, RMSprop
+from keras.layers.core import Dense
 from keras.layers.advanced_activations import PReLU
 import matplotlib.pyplot as plt
 
@@ -164,7 +160,6 @@ def show(qmaze):
     canvas[rat_row, rat_col] = 0.3   # rat cell
     canvas[nrows - 1, ncols - 1] = 0.9  # cheese cell
     img = plt.imshow(canvas, interpolation='none', cmap='gray')
-    plt.show()
     return img
 
 
@@ -397,6 +392,5 @@ if __name__ == '__main__':
     ])
 
     qmaze = Qmaze(maze)
-    show(qmaze)
     model = build_model(maze)
-	qtrain(model, maze, epochs=1000, max_memory=8*maze.size, data_size=32)
+    qtrain(model, maze, epochs=1000, max_memory=8*maze.size, data_size=32)
