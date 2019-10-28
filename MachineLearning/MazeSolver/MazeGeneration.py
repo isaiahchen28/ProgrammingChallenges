@@ -72,7 +72,7 @@ def get_colors():
     }
 
 
-def save_maze(maze, blockSize, name, directory):
+def save_maze(maze, blockSize, name, directory=os.getcwd()):
     '''
     This will save a maze object to a file.
     **Parameters**
@@ -118,7 +118,7 @@ def save_maze(maze, blockSize, name, directory):
     img.save(output_string)
 
 
-def load_maze(filename, blockSize=10, directory=""):
+def load_maze(filename, blockSize=10, directory=os.getcwd()):
     '''
     This will read a maze from a png file into a 2d list with values
     corresponding to the known color dictionary.
@@ -167,7 +167,8 @@ def pos_chk(x, y, nBlocks):
     return x >= 0 and x < nBlocks and y >= 0 and y < nBlocks
 
 
-def generate_maze(nBlocks, name, start, blockSize, slow, directory):
+def generate_maze(nBlocks, name, start, blockSize, slow,
+                  directory=os.getcwd()):
     '''
     Generate a maze using the Depth First Search method.
     **Parameters**
@@ -249,7 +250,7 @@ def generate_maze(nBlocks, name, start, blockSize, slow, directory):
     save_maze(maze, blockSize=blockSize, name=name, directory=directory)
 
 
-def solve_maze(filename, start, end, blockSize, slow, directory):
+def solve_maze(filename, start, end, blockSize, slow, directory=os.getcwd()):
     '''
     Solve a maze using the Depth First Search method.
     **Parameters**
@@ -328,19 +329,4 @@ def solve_maze(filename, start, end, blockSize, slow, directory):
 
 
 if __name__ == "__main__":
-    # Generate mazes and solutions for training data
-    N_train = 100
-    directory = "training"
-    for i in range(N_train):
-        generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False,
-                      directory=directory)
-        solve_maze(str(i), start=(0, 0), end=(49, 49), blockSize=10,
-                   slow=False, directory=directory)
-    # Generate mazes and solutions for testing data
-    N_test = 10
-    directory = "testing"
-    for i in range(N_test):
-        generate_maze(50, name=str(i), start=(0, 0), blockSize=10, slow=False,
-                      directory=directory)
-        solve_maze(str(i), start=(0, 0), end=(49, 49), blockSize=10,
-                   slow=False, directory=directory)
+    generate_maze(50, name="maze", start=(0, 0), blockSize=10, slow=False)
