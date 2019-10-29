@@ -92,14 +92,96 @@ There are two types of moves in regard to Q-learning:
 The exploration factor, epsilon, is the the frequency level of how much
 exploration to do. It is usually set to 0.1, which roughly means that in one
 of every 10 moves the agent takes a completely random action.
+
+The policy function can be very difficult to find, especially for larger
+environments. A common technique was to start with a different kind of
+function, Q(s,a), called the best utility/quality function:
+
+Q(s,a) = the maximum total reward we can get by choosing action a in state s
+
+For maze solving, it is easy to be convinced that such function exists,
+although we have no idea how to compute it efficiently (except for going
+through all possible Markov chains that start at state s, which is very
+inefficient). But it can also be proved mathematically for all similar Markov
+systems. Our policy function will be:
+
+pi(s) = argmax(Q(s,a_i))(i = 0,1,...,n-1)
+
+We calculate Q(s,a_i) for all actions a_i, where i = 0,1,...,n−1 (where n is
+the number of actions), and select the action a_i for which Q(s,a_i) is
+maximal. We define Q(s,a) using Bellman's Equation, as shown below:
+
+Q(s,a) = R(s,a) + max(Q(s',a_i))(i = 0,1,...,n-1), where s' is the transition
+function and R is the reward function.
+
+
+Training the Neural Network
+------------------------------------------------------------------------------
+The usual arrangement for training a neural network is to generate a
+sufficiently large dataset of (e,q) pairs, where e is an environment state and
+q = (q_0,q_1,...,q_n−1) are the correct actions (q-values). To do this, we
+will have to simulate thousands of games and make sure that all our moves are
+optimal (or else our q-values may not be correct). However, this approach is
+impractical.
+
+Here, we try a more practical and surprisingly elegant scheme for tackling
+this problem. The scheme is as follows:
+
+1. We will generate our training samples from using the neural network itself,
+   by simulating hundreds or thousands of games. We will exploit the derived
+   policy, pi, to make 90% of our game moves (the other 10% of the moves are
+   reserved for exploration). However, we will set the target function of our
+   neural network to be the function in the right side of Bellman's equation.
+   Assuming that our neural network converges, it will define a function
+   Q(s,a) which satisfies Bellman's equation, and therefore it must be the
+   best utility function which we seek.
+
+2. The training of the network, N, will be done after each game move by
+   injecting a random selection of the most recent training samples to N.
+   Assuming that our game skill will get better in time, we will use only a
+   small number of the most recent training samples. We will forget old
+   samples (which are probably bad) and will delete them from memory.
+
+3. After each game move we will generate an episode and save it to a short
+   term memory sequence. An episode is a tuple of 5 elements that we need for
+   one training:
+
+    episode = [envstate, action, reward, envstate_next, game_over]:
+        envstate - environment state. This is a full picture of the maze cells
+                   (the state of each cell including agent and target
+                   location).To make it easier for our neural network, we
+                   squash the maze to a 1-dimensional vector that fits the
+                   network input.
+        action - one of the four actions that the agent can move.
+        reward - the reward received from the action.
+        envstate_next - the new maze environment state which resulted from the
+                        last action.
+        game_over - a boolean value which indicates if the game is over or
+                    not. The game is over if the agent has reached the target,
+                    or if the agent has reached the negative reward limit
+                    (lose).
+
+After each move in the game, we form the episode and insert it into our memory
+sequence. In case our memory sequence size grows beyond a fixed bound we
+delete elements from its tail to keep it below this bound.
+
+The weights of network N are initialized with random values, so in the
+beginning N will produce awful results, but if our model parameters are chosen
+properly, it should converge to a solution of the Bellman Equation, and
+therefore later experiments are expected to be more truthful. Currently,
+building model that converge quickly seems to be very difficult and there is
+still lots of room for improvements in this issue.
 '''
 import datetime
 import json
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
 import generate
+from keras.models import Sequential
+from keras.layers.core import Dense, Activation
+from keras.optimizers import SGD, Adam, RMSprop
+from keras.layers.advanced_activations import PReLU
 
 
 def get_actions():
@@ -551,18 +633,29 @@ def build_model(maze):
     '''
     Build the neural network model
     '''
-    model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Dense(49, input_shape=(49,), activation='relu'))
-    model.add(tf.keras.layers.Dense(49, activation='relu'))
-    model.add(tf.keras.layers.Dense(4))
+    model = Sequential()
+    model.add(Dense(maze.size, input_shape=(maze.size,)))
+    model.add(PReLU())
+    model.add(Dense(maze.size))
+    model.add(PReLU())
+    model.add(Dense(4))
     model.compile(optimizer='adam', loss='mse')
     return model
 
 
 if __name__ == '__main__':
-    generate.generate_maze(7, name="maze", start=(0, 0), blockSize=10,
-                           slow=False)
-    maze = generate.load_maze("maze")
-    maze = np.array([[float(j) for j in i] for i in maze])
+    # generate.generate_maze(7, name="maze", start=(0, 0), blockSize=10,
+    #                        slow=False)
+    # maze = generate.load_maze("maze")
+    # maze = np.array([[float(j) for j in i] for i in maze])
+    maze =  np.array([
+    [ 1.,  0.,  1.,  1.,  1.,  1.,  1.],
+    [ 1.,  1.,  1.,  0.,  0.,  1.,  0.],
+    [ 0.,  0.,  0.,  1.,  1.,  1.,  0.],
+    [ 1.,  1.,  1.,  1.,  0.,  0.,  1.],
+    [ 1.,  0.,  0.,  0.,  1.,  1.,  1.],
+    [ 1.,  0.,  1.,  1.,  1.,  1.,  1.],
+    [ 1.,  1.,  1.,  0.,  1.,  1.,  1.]
+    ])
     model = build_model(maze)
     qtrain(model, maze)
