@@ -93,13 +93,13 @@ The exploration factor, epsilon, is the the frequency level of how much
 exploration to do. It is usually set to 0.1, which roughly means that in one
 of every 10 moves the agent takes a completely random action.
 '''
-from generate import load_maze
 import datetime
 import json
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import generate
 
 
 def get_actions():
@@ -144,13 +144,13 @@ class Qmaze(object):
         # Define valid paths
         self.paths = [(r, c) for r in range(nrows)
                       for c in range(ncols) if self.maze[r, c] == 1.0]
-        # Remove the target position from the list of valid paths
-        self.paths.remove(self.target)
         # Checks for if a maze is valid or not
         if self.maze[self.target] == 0.0:
             raise Exception("Invalid Maze: target cell cannot be blocked!")
         if pos not in self.paths:
             raise Exception("Invalid Location")
+        # Remove the target position from the list of valid paths
+        self.paths.remove(self.target)
         # Call reset function during initialization
         self.reset(pos)
 
@@ -555,12 +555,14 @@ def build_model(maze):
     model.add(tf.keras.layers.Dense(49, input_shape=(49,), activation='relu'))
     model.add(tf.keras.layers.Dense(49, activation='relu'))
     model.add(tf.keras.layers.Dense(4))
-    model.compile(optimizer='RMSprop', loss='mse')
+    model.compile(optimizer='adam', loss='mse')
     return model
 
 
 if __name__ == '__main__':
-    maze = load_maze("maze")
+    generate.generate_maze(7, name="maze", start=(0, 0), blockSize=10,
+                           slow=False)
+    maze = generate.load_maze("maze")
     maze = np.array([[float(j) for j in i] for i in maze])
     model = build_model(maze)
     qtrain(model, maze)

@@ -245,6 +245,8 @@ def generate_maze(nBlocks, name, start, blockSize, slow,
             save_maze(maze, blockSize=blockSize, name=name,
                       directory=directory)
     # Save the generated maze and set start/end points
+    maze[0][0] = 1
+    maze[nBlocks - 1][nBlocks - 1] = 1
     save_maze(maze, blockSize=blockSize, name=name, directory=directory)
 
 
