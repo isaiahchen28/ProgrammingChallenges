@@ -1,5 +1,6 @@
 '''
 Maze Solver
+https://samyzaf.com/ML/rl/qmaze.html
 '''
 from __future__ import print_function
 import datetime
@@ -13,26 +14,47 @@ import matplotlib.pyplot as plt
 
 
 class Qmaze(object):
-    def __init__(self, maze, rat=(0, 0)):
-        self._maze = np.array(maze)
-        nrows, ncols = self._maze.shape
-        # target cell where the "cheese" is
-        self.target = (nrows - 1, ncols - 1)
-        self.free_cells = [(r, c) for r in range(nrows)
-                           for c in range(ncols) if self._maze[r, c] == 1.0]
-        self.free_cells.remove(self.target)
-        if self._maze[self.target] == 0.0:
-            raise Exception("Invalid maze: target cell cannot be blocked!")
-        if rat not in self.free_cells:
-            raise Exception("Invalid Rat Location: must sit on a free cell")
-        self.reset(rat)
+    '''
+    Class object for representing the maze in the context of Q-learning
+    **Parameters**
+        maze: *list, list, int*
+            A list of lists, holding integers specifying the different aspects
+            of the maze:
+                0 - Black - A wall
+                1 - White - A space to travel in the maze
+        pos: *tuple, int*
+            The current position of the pointer.
+    '''
 
-    def reset(self, rat):
-        self.rat = rat
-        self.maze = np.copy(self._maze)
+    def __init__(self, maze, pos=(0, 0)):
+        # Save maze as a NumPy array
+        self.maze = np.array(maze)
+        # Define the target position
         nrows, ncols = self.maze.shape
-        row, col = rat
-        self.maze[row, col] = rat_mark
+        self.target = (nrows - 1, ncols - 1)
+        # Define valid paths
+        self.paths = [(r, c) for r in range(nrows)
+                      for c in range(ncols) if self.maze[r, c] == 1]
+        # Remove the target position from the list of valid paths
+        self.paths.remove(self.target)
+        # Checks
+        if self.maze[self.target] == 0:
+            raise Exception("Invalid Maze: target cell cannot be blocked!")
+        if pos not in self.paths:
+            raise Exception("Invalid Location")
+        # Call reset function
+        self.reset(pos)
+
+    def reset(self, pos):
+        '''
+        
+        '''
+        self.pos = pos
+        self.maze = np.copy(self.maze)
+        nrows, ncols = self.maze.shape
+        row, col = pos
+        # Set maze position
+        self.maze[row, col] = 0.5
         self.state = (row, col, 'start')
         self.min_reward = -0.5 * self.maze.size
         self.total_reward = 0
@@ -102,7 +124,7 @@ class Qmaze(object):
                     canvas[r, c] = 1.0
         # draw the rat
         row, col, valid = self.state
-        canvas[row, col] = rat_mark
+        canvas[row, col] = 0.5
         return canvas
 
     def game_status(self):
@@ -313,10 +335,12 @@ def qtrain(model, maze, **opt):
         dt = datetime.datetime.now() - start_time
         t = format_time(dt.total_seconds())
         template = "Epoch: {:03d}/{:d} | Loss: {:.4f} | Episodes: {:d} | Win count: {:d} | Win rate: {:.3f} | time: {}"
-        print(template.format(epoch, n_epoch-1, loss, n_episodes, sum(win_history), win_rate, t))
+        print(template.format(epoch, n_epoch-1, loss,
+                              n_episodes, sum(win_history), win_rate, t))
         # we simply check if training has exhausted all free cells and if in all
         # cases the agent won
-        if win_rate > 0.9 : epsilon = 0.05
+        if win_rate > 0.9:
+            epsilon = 0.05
         if sum(win_history[-hsize:]) == hsize and completion_check(model, qmaze):
             print("Reached 100%% win rate at epoch: %d" % (epoch,))
             break
@@ -332,7 +356,8 @@ def qtrain(model, maze, **opt):
     seconds = dt.total_seconds()
     t = format_time(seconds)
     print('files: %s, %s' % (h5file, json_file))
-    print("n_epoch: %d, max_mem: %d, data: %d, time: %s" % (epoch, max_memory, data_size, t))
+    print("n_epoch: %d, max_mem: %d, data: %d, time: %s" %
+          (epoch, max_memory, data_size, t))
     return seconds
 
 
@@ -361,8 +386,7 @@ def build_model(maze, lr=0.001):
 
 
 if __name__ == '__main__':
-    visited_mark = 0.8  # Cells visited by the rat will be painted by gray 0.8
-    rat_mark = 0.5      # The current rat cell will be painteg by gray 0.5
+    visited_mark = 0.8  # Cells visited by the rat will be painted by gray 0.8     # The current rat cell will be painteg by gray 0.5
     LEFT = 0
     UP = 1
     RIGHT = 2
@@ -381,14 +405,14 @@ if __name__ == '__main__':
     # Exploration factor
     epsilon = 0.1
 
-    maze =  np.array([
-    [ 1.,  0.,  1.,  1.,  1.,  1.,  1.],
-    [ 1.,  1.,  1.,  0.,  0.,  1.,  0.],
-    [ 0.,  0.,  0.,  1.,  1.,  1.,  0.],
-    [ 1.,  1.,  1.,  1.,  0.,  0.,  1.],
-    [ 1.,  0.,  0.,  0.,  1.,  1.,  1.],
-    [ 1.,  0.,  1.,  1.,  1.,  1.,  1.],
-    [ 1.,  1.,  1.,  0.,  1.,  1.,  1.]
+    maze = np.array([
+        [1.,  0.,  1.,  1.,  1.,  1.,  1.],
+        [1.,  1.,  1.,  0.,  0.,  1.,  0.],
+        [0.,  0.,  0.,  1.,  1.,  1.,  0.],
+        [1.,  1.,  1.,  1.,  0.,  0.,  1.],
+        [1.,  0.,  0.,  0.,  1.,  1.,  1.],
+        [1.,  0.,  1.,  1.,  1.,  1.,  1.],
+        [1.,  1.,  1.,  0.,  1.,  1.,  1.]
     ])
 
     qmaze = Qmaze(maze)
