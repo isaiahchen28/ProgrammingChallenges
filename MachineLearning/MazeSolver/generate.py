@@ -327,4 +327,4 @@ def solve_maze(filename, start, end, blockSize, slow, directory=os.getcwd()):
 
 
 if __name__ == "__main__":
-    generate_maze(50, name="maze", start=(0, 0), blockSize=10, slow=False)
+    generate_maze(7, name="maze", start=(0, 0), blockSize=10, slow=False)
