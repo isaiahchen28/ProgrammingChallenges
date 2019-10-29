@@ -47,7 +47,7 @@ class Qmaze(object):
 
     def reset(self, pos):
         '''
-        
+        Reset the pointer to its starting position
         '''
         self.pos = pos
         self.maze = np.copy(self.maze)
@@ -61,14 +61,17 @@ class Qmaze(object):
         self.visited = set()
 
     def update_state(self, action):
+        '''
+        Update the state of the maze
+        '''
         nrows, ncols = self.maze.shape
-        nrow, ncol, nmode = rat_row, rat_col, mode = self.state
-
-        if self.maze[rat_row, rat_col] > 0.0:
-            self.visited.add((rat_row, rat_col))  # mark visited cell
-
+        nrow, ncol, nmode = pos_row, pos_col, mode = self.state
+        # Mark a visited space by adding it to the appropriate set
+        if self.maze[pos_row, pos_col] > 0:
+            self.visited.add((pos_row, pos_col))
+        # Obtain list of valid actions
         valid_actions = self.valid_actions()
-
+        # Check if there are any valid actions and adjust position accordingly
         if not valid_actions:
             nmode = 'blocked'
         elif action in valid_actions:
@@ -81,89 +84,123 @@ class Qmaze(object):
                 ncol += 1
             elif action == DOWN:
                 nrow += 1
-        else:                  # invalid action, no change in rat position
+        # If we reach this point, there is an invalid action and we keep the
+        # same position
+        else:
             nmode = 'invalid'
-
-        # new state
+        # Define the new state
         self.state = (nrow, ncol, nmode)
 
     def get_reward(self):
-        rat_row, rat_col, mode = self.state
+        '''
+        Get the reward value
+        '''
+        # Obtain position
+        pos_row, pos_col, mode = self.state
         nrows, ncols = self.maze.shape
-        if rat_row == nrows - 1 and rat_col == ncols - 1:
+        # Check if we reached the target
+        if pos_row == nrows - 1 and pos_col == ncols - 1:
             return 1.0
+        # Check if our action is blocked
         if mode == 'blocked':
             return self.min_reward - 1
-        if (rat_row, rat_col) in self.visited:
+        # Check if we visited this position before
+        if (pos_row, pos_col) in self.visited:
             return -0.25
+        # Check if our action is invalid
         if mode == 'invalid':
             return -0.75
+        # Check if our action is valid
         if mode == 'valid':
             return -0.04
 
     def act(self, action):
+        '''
+        Function to call other functions
+        '''
+        # Update state
         self.update_state(action)
+        # Get reward and update the total reward
         reward = self.get_reward()
         self.total_reward += reward
+        # Obtain win or loss status
         status = self.game_status()
+        # Get the current environment
         envstate = self.observe()
         return envstate, reward, status
 
     def observe(self):
+        '''
+        Obtain the current environment
+        '''
         canvas = self.draw_env()
         envstate = canvas.reshape((1, -1))
         return envstate
 
     def draw_env(self):
+        '''
+        Draw the maze environment
+        '''
         canvas = np.copy(self.maze)
         nrows, ncols = self.maze.shape
-        # clear all visual marks
+        # Clear all visual marks
         for r in range(nrows):
             for c in range(ncols):
-                if canvas[r, c] > 0.0:
-                    canvas[r, c] = 1.0
-        # draw the rat
+                if canvas[r, c] > 0:
+                    canvas[r, c] = 1
+        # Draw the current pointer
         row, col, valid = self.state
         canvas[row, col] = 0.5
         return canvas
 
     def game_status(self):
+        '''
+        Check the status of the game
+        '''
         if self.total_reward < self.min_reward:
             return 'lose'
-        rat_row, rat_col, mode = self.state
+        pos_row, pos_col, mode = self.state
         nrows, ncols = self.maze.shape
-        if rat_row == nrows - 1 and rat_col == ncols - 1:
+        if pos_row == nrows - 1 and pos_col == ncols - 1:
             return 'win'
-
+        # If we reach this point, the game is still in progress
         return 'not_over'
 
     def valid_actions(self, cell=None):
+        '''
+        Get the valid actions
+        '''
         if cell is None:
             row, col, mode = self.state
         else:
             row, col = cell
+        # Define the list of possible actions:
+        #   LEFT = 0
+        #   UP = 1
+        #   RIGHT = 2
+        #   DOWN = 3
         actions = [0, 1, 2, 3]
         nrows, ncols = self.maze.shape
+        # Remove UP or DOWN
         if row == 0:
             actions.remove(1)
         elif row == nrows - 1:
             actions.remove(3)
-
+        # Remove LEFT or RIGHT
         if col == 0:
             actions.remove(0)
         elif col == ncols - 1:
             actions.remove(2)
-
-        if row > 0 and self.maze[row - 1, col] == 0.0:
+        # Remove UP or DOWN
+        if row > 0 and self.maze[row - 1, col] == 0:
             actions.remove(1)
-        if row < nrows - 1 and self.maze[row + 1, col] == 0.0:
+        if row < nrows - 1 and self.maze[row + 1, col] == 0:
             actions.remove(3)
-
-        if col > 0 and self.maze[row, col - 1] == 0.0:
+        # Remove LEFT or RIGHT
+        if col > 0 and self.maze[row, col - 1] == 0:
             actions.remove(0)
-        if col < ncols - 1 and self.maze[row, col + 1] == 0.0:
+        if col < ncols - 1 and self.maze[row, col + 1] == 0:
             actions.remove(2)
-
         return actions
 
 
@@ -178,8 +215,8 @@ def show(qmaze):
     canvas = np.copy(qmaze.maze)
     for row, col in qmaze.visited:
         canvas[row, col] = 0.6
-    rat_row, rat_col, _ = qmaze.state
-    canvas[rat_row, rat_col] = 0.3   # rat cell
+    pos_row, pos_col, _ = qmaze.state
+    canvas[pos_row, pos_col] = 0.3   # rat cell
     canvas[nrows - 1, ncols - 1] = 0.9  # cheese cell
     img = plt.imshow(canvas, interpolation='none', cmap='gray')
     return img
@@ -203,7 +240,7 @@ def play_game(model, qmaze, rat_cell):
 
 
 def completion_check(model, qmaze):
-    for cell in qmaze.free_cells:
+    for cell in qmaze.paths:
         if not qmaze.valid_actions(cell):
             return False
         if not play_game(model, qmaze, cell):
@@ -276,14 +313,14 @@ def qtrain(model, maze, **opt):
     experience = Experience(model, max_memory=max_memory)
 
     win_history = []   # history of win/lose game
-    n_free_cells = len(qmaze.free_cells)
+    n_paths = len(qmaze.paths)
     hsize = qmaze.maze.size // 2   # history window size
     win_rate = 0.0
     imctr = 1
 
     for epoch in range(n_epoch):
         loss = 0.0
-        rat_cell = random.choice(qmaze.free_cells)
+        rat_cell = random.choice(qmaze.paths)
         qmaze.reset(rat_cell)
         game_over = False
 
