@@ -555,7 +555,7 @@ def build_model(maze):
     model.add(tf.keras.layers.Dense(49, input_shape=(49,), activation='relu'))
     model.add(tf.keras.layers.Dense(49, activation='relu'))
     model.add(tf.keras.layers.Dense(4))
-    model.compile(optimizer='adam', loss='mse')
+    model.compile(optimizer='RMSprop', loss='mse')
     return model
 
 
