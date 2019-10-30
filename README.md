@@ -5,4 +5,3 @@ Relevant links for resources are listed here:
 * https://projecteuler.net/about
 * https://www.reddit.com/r/dailyprogrammer/
 * http://yann.lecun.com/exdb/mnist/
-* https://samyzaf.com/ML/rl/qmaze.html
