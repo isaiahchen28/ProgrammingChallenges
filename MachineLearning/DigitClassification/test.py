@@ -100,24 +100,14 @@ def build_network(x_train, y_train, x_test, y_test,
 
     '''
     # Build the model
-    model = Sequential()
-    model.add(Dense(512, input_shape=(784,)))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(512))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(10))
-    model.add(Activation('softmax'))
+    raise Exception("Here is where you build your model using Keras!")
+
     # Compile the model
-    model.compile(loss='categorical_crossentropy',
-                  metrics=['accuracy'], optimizer='adam')
+    raise Exception("Here is where you compile your model!")
 
     # Train the model
-    history = model.fit(x_train, y_train,
-                        batch_size=128, epochs=20,
-                        verbose=2,
-                        validation_data=(x_test, y_test))
+    raise Exception("Here is where you train your model!")
+
     # Save the model
     save_dir = os.getcwd()
     model_path = os.path.join(save_dir, model_name)
